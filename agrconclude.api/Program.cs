@@ -11,7 +11,7 @@ internal class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        var app = builder.Build();
+        var app = builder.Buil();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
