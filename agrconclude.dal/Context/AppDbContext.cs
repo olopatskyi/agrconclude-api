@@ -11,6 +11,7 @@ namespace agrconclude.dal.Context
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public DbSet<Contract>? Contracts { get; set; }
