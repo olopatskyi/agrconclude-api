@@ -1,4 +1,8 @@
+using agrconclude.api.DTOs.Request;
+using agrconclude.api.DTOs.Response;
+using agrconclude.core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace agrconclude.api.Controllers
 {
@@ -6,10 +10,18 @@ namespace agrconclude.api.Controllers
     [Route("api/v1/auth")]
     public class AuthController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Test()
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
         {
-            return Ok();
+            _authService = authService;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync(LoginRequest request)
+        {
+            var result = await _authService.LoginAsync<LoginRequest, LoginResponse>(request);
+            return Ok(result);
         }
     }
 }
