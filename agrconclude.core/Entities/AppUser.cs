@@ -4,6 +4,12 @@ namespace agrconclude.core.Entities
 {
     public class AppUser : IdentityUser<Guid>
     {
-        ICollection<Contract>? Contracts { get; set; }
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string AvatarUrl { get; set; }
+
+        public ICollection<UserContract>? Contracts { get; set; }
     }
 }
