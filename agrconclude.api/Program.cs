@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using agrconclude.api.Extensions;
 
 internal class Program
 {
@@ -26,14 +27,18 @@ internal class Program
         //Configure database
         builder.Services.AddDbContext<AppDbContext>(option =>
         {
-            var server = "localhost";
-            var port = "1433";
-            var database = "agrconclude";
-            var username = "sa";
-            var password = "P@ssw0rd";
+            var server = builder.Configuration["SERVER_NAME"] ?? "localhost";
+            var port = builder.Configuration["PORT"] ?? "5432";
+            var database = builder.Configuration["DATABASE_NAME"] ?? "agrconclude";
+            var username = builder.Configuration["USERNAME"] ?? "postgres";
+            var password = builder.Configuration["PASSWORD"] ?? "password";
             var connectionString =
-            $"Server={server},{port};Initial Catalog={database};USER ID={username};Password={password}";
-            option.UseSqlServer(connectionString);
+            @$"Host={server};
+               Port={port};
+               Database={database};
+               Username={username};
+               Password={password};";
+            option.UseNpgsql(connectionString);
         });
 
         //Configure automapper
@@ -116,11 +121,24 @@ internal class Program
         builder.Services.AddControllers();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AnyOrigin", optionsBuilder =>
+            {
+                optionsBuilder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod();
+            });
+        });
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-
+        
         var app = builder.Build();
 
+        app.UseCors("AnyOrigin");
+        
         app.UseSwagger();
         app.UseSwaggerUI();
 
@@ -129,7 +147,9 @@ internal class Program
         app.UseAuthorization();
 
         app.MapControllers();
-
+        
+        app.InitializeDatabase();
+        
         app.Run();
     }
 }

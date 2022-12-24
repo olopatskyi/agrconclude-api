@@ -3,7 +3,6 @@ using agrconclude.dal.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace agrconclude.dal.Context
 {
@@ -11,7 +10,6 @@ namespace agrconclude.dal.Context
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            Database.EnsureCreated();
         }
 
         public DbSet<Contract>? Contracts { get; set; }
