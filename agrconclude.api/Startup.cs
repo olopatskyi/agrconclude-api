@@ -22,11 +22,11 @@ public class Startup
         //Configure database connection
         services.CreateDatabaseConnection(connection: () => new DbConnectionSettings()
         {
-            Server = "localhost",
-            Port = "5432",
-            Database = "agrconclude",
-            UserID = "postgres",
-            Password = "password"
+            Server = Configuration.GetValue<string>("DatabaseSettings:Server"),
+            Port = Configuration.GetValue<string>("DatabaseSettings:Port"),
+            Database = Configuration.GetValue<string>("DatabaseSettings:Database"),
+            UserID = Configuration.GetValue<string>("DatabaseSettings:UserID"),
+            Password = Configuration.GetValue<string>("DatabaseSettings:Password")
         });
 
         

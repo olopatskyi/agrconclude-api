@@ -22,7 +22,7 @@ internal class Program
             }
             catch (Exception exception)
             {
-                logger.LogInformation("An error occured while migrating the database");
+                logger.LogInformation($"An error occured while migrating the database. \n {exception.Message}");
             }
         }
         
