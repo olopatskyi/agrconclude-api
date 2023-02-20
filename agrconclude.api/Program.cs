@@ -1,39 +1,46 @@
 using agrconclude.api;
 using agrconclude.dal;
 using agrconclude.dal.Context;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 internal class Program
 {
     public static void Main(string[] args)
     {
-        var host = CreateHostBuilder(args)
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
-        using (var scope = host.Services.CreateScope())
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
+
+        try
         {
-            var services = scope.ServiceProvider;
-            var logger = services.GetRequiredService<ILogger<Program>>();
-            try
-            {
-                logger.LogInformation("Trying to migrate database...");
-                var context = services.GetRequiredService<AppDbContext>();
-                DbSeeder.Seed(context);
-                logger.LogInformation("Database successfully migrated");
-            }
-            catch (Exception exception)
-            {
-                logger.LogInformation($"An error occured while migrating the database. \n {exception.Message}");
-            }
+            Log.Information("Starting host...");
+            CreateHostBuilder(args).Build().MigrateDatabaseOnStart().Run();
         }
-        
-        host.Run();
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Host terminated unexpectedly");
+        }
+        finally
+        {
+            Log.Information("Stopping host...");
+            Log.CloseAndFlush();
+        }
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(builder => { builder.UseStartup<Startup>(); });
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSerilog()
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
 
-        return host;
-    }
 }

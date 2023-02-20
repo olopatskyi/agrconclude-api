@@ -5,7 +5,7 @@ namespace agrconclude.services;
 
 public static class ServiceCollectionExtensions
 {
-    public static void ConstructServices(this IServiceCollection services)
+    public static void AddServices(this IServiceCollection services)
     {
         services.AddTransient<IAuthService, AuthService>();
     } 

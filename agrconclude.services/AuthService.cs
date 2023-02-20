@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
@@ -18,15 +19,15 @@ namespace agrconclude.services
 {
     public class AuthService : IAuthService
     {
-        private readonly IAuthSettings _authSettings;
+        private readonly IJwtOptions _jwtOptions;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
 
-        public AuthService(UserManager<AppUser> userManager, IMapper mapper, IAuthSettings authSettings)
+        public AuthService(UserManager<AppUser> userManager, IMapper mapper, IJwtOptions jwtOptions)
         {
             _userManager = userManager;
             _mapper = mapper;
-            _authSettings = authSettings;
+            _jwtOptions = jwtOptions;
         }
 
         public async Task<TOut> LoginAsync<TIn, TOut>(TIn request)
@@ -80,12 +81,12 @@ namespace agrconclude.services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-            string s = _authSettings.Key;
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettings.Key));
+            string s = _jwtOptions.Key;
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                    issuer: _authSettings.Issuer,
-                    audience: _authSettings.Audience,
+                    issuer: _jwtOptions.Issuer,
+                    audience: _jwtOptions.Audience,
                     claims: claims,
                     signingCredentials: credentials);
 

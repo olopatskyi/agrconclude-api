@@ -3,7 +3,7 @@ version: '3.4'
 services:
     api:
       container_name: agrconclude.api
-      image: olopatskyi/agrconclude.api
+      image: agrconclude.api
       ports:
         - "8000:80"
       environment:
@@ -21,20 +21,6 @@ services:
       volumes:
         - local_pgdata:/var/lib/postgresql/data
     
-
-    pgadmin:
-      image: dpage/pgadmin4
-      container_name: pgadmin
-      restart: always
-      ports:
-        - "5050:80"
-      environment:
-        PGADMIN_DEFAULT_EMAIL: user@agrconclude.com
-        PGADMIN_DEFAULT_PASSWORD: password
-      volumes:
-        - pgadmin-data:/var/lib/pgadmin
-    
 volumes:
   local_pgdata:
-  pgadmin-data:
       

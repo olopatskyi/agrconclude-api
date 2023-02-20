@@ -17,5 +17,14 @@ namespace agrconclude.api.DTOs.Response
             PropertyName = propertyName;
             Message = message;
         }
+
+        public static ErrorResponse Create(string message, string? propertyName = null)
+        {
+            return new ErrorResponse()
+            {
+                PropertyName = propertyName,
+                Message = message
+            };
+        }
     }
 }

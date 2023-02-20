@@ -1,36 +1,101 @@
+using System.Reflection;
 using System.Text;
+using agrconclude.core.Entities;
 using agrconclude.core.Settings;
+using agrconclude.dal.Context;
+using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 namespace agrconclude.api;
 
 public static class ServiceCollectionExtensions
 {
-    public static void ConfigureAuthentication(this IServiceCollection @this, IConfiguration configuration)
+    public static void AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        @this.AddAuthentication(options =>
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["Jwt:Issuer"],
+                ValidAudience = configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration?["JwtConfig:Key"]
+                    ?? throw new InvalidOperationException("Missing JWT secret key configuration")))
+            };
+        });
+    }
+
+    public static void AddIdentity(this IServiceCollection services)
+    {
+        services.AddIdentityCore<AppUser>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 8;
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedPhoneNumber = true;
             })
-            .AddJwtBearer(option =>
+            .AddRoles<IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+    }
+
+    public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        string host = configuration.GetValue<string>("DatabaseSettings:Host") ?? "localhost";
+        string port = configuration.GetValue<string>("DatabaseSettings:Port") ?? "5432";
+        string database = configuration.GetValue<string>("DatabaseSettings:Database") ?? "agrconclude";
+        string username = configuration.GetValue<string>("DatabaseSettings:Username") ?? "postgres";
+        string password = configuration.GetValue<string>("DatabaseSettings:Password") ?? "password";
+
+        string connectionString =
+             $@"Host={host};
+                Port={port};
+                Database={database};
+                Username={username};
+                Password={password}";
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString));
+    }
+
+    public static void AddAutoMapper(this IServiceCollection services)
+    {
+        services.AddSingleton(provider =>
+        {
+            var config = new MapperConfiguration(cfg =>
             {
-                var authSettings = configuration.GetSection(AuthSettings.SectionName).Get<AuthSettings>();
-                option.RequireHttpsMetadata = false;
-                option.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = authSettings.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = authSettings.Audience,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Key)),
-                    ValidateLifetime = false
-                };
+                cfg.AddMaps(Assembly.GetExecutingAssembly());
+                cfg.ConstructServicesUsing(type => ActivatorUtilities.CreateInstance(provider, type));
             });
+
+            config.AssertConfigurationIsValid();
+            return config.CreateMapper();
+        });
+    }
+
+    public static void AddValidation(this IServiceCollection services)
+    {
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<Program>();
     }
 
     public static void InitializeSwagger(this IServiceCollection services)
@@ -71,5 +136,29 @@ public static class ServiceCollectionExtensions
                 }
             });
         });
+    }
+
+    public static void AddOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtOptions>(configuration.GetSection("JwtConfig"));
+        services.AddScoped<IJwtOptions>(provider => provider.GetRequiredService<IOptions<JwtOptions>>().Value);
+    }
+
+    public static IHost MigrateDatabaseOnStart(this IHost host)
+    {
+        using var scope = host.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        var database = services.GetRequiredService<AppDbContext>().Database;
+        try
+        {
+            database.Migrate();
+            Log.Logger.Information("Database migrated successfully.");
+        }
+        catch (Exception)
+        {
+            Log.Logger.Error("An error occurred while migrating the database.");
+        }
+
+        return host;
     }
 }

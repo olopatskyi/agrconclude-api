@@ -2,7 +2,9 @@
 using agrconclude.core.Exceptions;
 using AutoMapper;
 using System.Net;
+using System.Reflection;
 using System.Text.Json;
+using ExceptionHandler;
 
 namespace agrconclude.api.Middlewares
 {
@@ -25,31 +27,15 @@ namespace agrconclude.api.Middlewares
             }
             catch (Exception exception)
             {
-                var response = context.Response;
-                var result = string.Empty;
-                response.ContentType = "application/json";
+                var handlerType = typeof(IExceptionHandler<>).MakeGenericType(exception.GetType());
+                var handler = context.RequestServices.GetRequiredService(handlerType);
 
-                switch (exception)
-                {
-                    case AppException ex:
-                        // custom application error
-                        response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        var appErrors = _mapper.Map<List<ErrorResponse>>(ex.ErrorMessages);
-                        result = JsonSerializer.Serialize(appErrors);
-                        break;
-                    case KeyNotFoundException ex:
-                        // not found error
-                        response.StatusCode = (int)HttpStatusCode.NotFound;
-                        result = JsonSerializer.Serialize(new { message = exception?.Message });
-                        break;
-                    default:
-                        // unhandled error
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        result = JsonSerializer.Serialize(new { message = exception?.Message });
-                        break;
-                }
+                var proceedAsyncMethod = handler.GetType().GetMethod(nameof(BaseExceptionHandler.ProceedAsync))
+                                         ?? throw new InvalidOperationException();
+                var handleExceptionTask =
+                    (Task)proceedAsyncMethod.Invoke(handler, new object[] { context, exception })!;
 
-                await response.WriteAsync(result);
+                await handleExceptionTask.ConfigureAwait(false);
             }
         }
     }

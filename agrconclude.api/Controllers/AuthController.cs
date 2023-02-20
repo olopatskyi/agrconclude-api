@@ -1,5 +1,6 @@
 using agrconclude.api.DTOs.Request;
 using agrconclude.api.DTOs.Response;
+using agrconclude.core.Exceptions;
 using agrconclude.core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
@@ -20,6 +21,7 @@ namespace agrconclude.api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync(LoginRequest request)
         {
+            throw new Exception("lalla");
             var result = await _authService.LoginAsync<LoginRequest, LoginResponse>(request);
             return Ok(result);
         }
