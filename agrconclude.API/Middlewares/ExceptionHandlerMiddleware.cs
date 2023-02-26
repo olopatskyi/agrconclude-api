@@ -35,7 +35,7 @@ namespace agrconclude.API.Middlewares
                         $"Method {nameof(IExceptionHandler<object>.ProceedAsync)} not found.");
 
                 Task handleExceptionTask =
-                    (Task)proceedAsyncMethod.Invoke(handler, new object[] { context, exception });
+                    (Task)proceedAsyncMethod.Invoke(handler, new object[] { context, exception })!;
 
                 await handleExceptionTask.ConfigureAwait(false);
             }
