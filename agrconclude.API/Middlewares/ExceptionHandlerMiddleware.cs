@@ -1,9 +1,5 @@
-﻿using agrconclude.API.DTOs.Response;
-using agrconclude.Domain.Exceptions;
-using AutoMapper;
-using System.Net;
+﻿using AutoMapper;
 using System.Reflection;
-using System.Text.Json;
 using ExceptionHandler;
 
 namespace agrconclude.API.Middlewares
