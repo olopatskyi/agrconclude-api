@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace agrconclude.Infrastructure.Data
 {
-    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
+    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<string>, string>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

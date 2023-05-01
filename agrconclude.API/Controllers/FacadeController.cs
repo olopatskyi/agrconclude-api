@@ -5,11 +5,11 @@ namespace agrconclude.API.Controllers;
 
 public class FacadeController : ControllerBase
 {
-    public Guid UserId => GetUserId();
+    public string UserId => GetUserId();
 
-    private Guid GetUserId()
+    private string GetUserId()
     {
         var id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.Parse(id!);
+        return id;
     }
 }

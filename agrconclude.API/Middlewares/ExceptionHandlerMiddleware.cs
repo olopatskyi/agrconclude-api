@@ -23,11 +23,14 @@ namespace agrconclude.API.Middlewares
             }
             catch (Exception exception)
             {
-                Type handlerType = typeof(IExceptionHandler<>).MakeGenericType(exception.GetType());
-                IExceptionHandler<object>? handler =
-                    (IExceptionHandler<object>?)context.RequestServices.GetService(handlerType)
-                    ?? (IExceptionHandler<object>)context.RequestServices.GetRequiredService(
-                        typeof(IExceptionHandler<Exception>));
+                var handlerType = typeof(IExceptionHandler<>).MakeGenericType(exception.GetType());
+
+                var handler = context.RequestServices.GetService(handlerType);
+                if (handler == null)
+                {
+                    handlerType = typeof(IExceptionHandler<>).MakeGenericType(typeof(Exception));
+                    handler = context.RequestServices.GetRequiredService(typeof(IExceptionHandler<Exception>));
+                }
 
                 MethodInfo proceedAsyncMethod =
                     handler.GetType().GetMethod(nameof(IExceptionHandler<object>.ProceedAsync))

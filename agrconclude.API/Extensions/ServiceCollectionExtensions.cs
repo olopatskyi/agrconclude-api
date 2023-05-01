@@ -3,6 +3,7 @@ using System.Text;
 using agrconclude.Domain.Entities;
 using agrconclude.Domain.Settings;
 using agrconclude.Infrastructure.Data;
+using agrconclude.Infrastructure.Repositories;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -57,7 +58,7 @@ public static class ServiceCollectionExtensions
                 options.SignIn.RequireConfirmedEmail = true;
                 options.SignIn.RequireConfirmedPhoneNumber = true;
             })
-            .AddRoles<IdentityRole<Guid>>()
+            .AddRoles<IdentityRole<string>>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
     }
@@ -146,5 +147,10 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<JwtOptions>(configuration.GetSection("JwtConfig"));
         services.AddScoped<IJwtOptions>(provider => provider.GetRequiredService<IOptions<JwtOptions>>().Value);
+    }
+
+    public static void AddRepository(this IServiceCollection services)
+    {
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
     }
 }

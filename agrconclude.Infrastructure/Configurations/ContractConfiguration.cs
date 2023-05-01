@@ -10,6 +10,19 @@ public class ContractConfiguration : IEntityTypeConfiguration<Contract>
     {
         builder.ToTable("Contracts");
 
-        builder.HasKey(c => c.DocumentId);
+        builder.HasKey(x => x.Id);
+        
+        builder
+            .HasOne(c => c.Creator)
+            .WithMany()
+            .HasForeignKey(c => c.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure the foreign key from Contract.ClientId to AppUser.Id
+        builder
+            .HasOne(c => c.Client)
+            .WithMany()
+            .HasForeignKey(c => c.ClientId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

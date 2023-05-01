@@ -14,5 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\agrconclude.Domain\agrconclude.Domain.csproj" />
+    <ProjectReference Include="..\agrconclude.Infrastructure\agrconclude.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

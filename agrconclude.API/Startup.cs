@@ -24,6 +24,8 @@ public class Startup
 
         services.AddDatabase(Configuration);
 
+        services.AddRepository();
+        
         services.AddIdentity();
 
         services.AddJwtAuthentication(Configuration);
@@ -35,7 +37,7 @@ public class Startup
         services.AddAutoMapper();
 
         services.AddValidation();
-        
+
         services.AddExceptionHandlers(Assembly.GetAssembly(typeof(Program)) ?? Assembly.GetExecutingAssembly());
 
         //Configure Swagger

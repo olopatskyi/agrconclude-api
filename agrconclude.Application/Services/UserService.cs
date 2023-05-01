@@ -18,7 +18,7 @@ public class UserService : IUserService
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    public async Task<TOut> GetUsersAsync<TOut>(Guid callerId)
+    public async Task<TOut> GetUsersAsync<TOut>(string callerId)
     {
         var users = await _userManager.Users
             .Where(u => u.Id != callerId)
