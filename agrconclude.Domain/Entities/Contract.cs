@@ -2,24 +2,26 @@ namespace agrconclude.Domain.Entities
 {
     public enum ContractStatus
     {
-        Sent,
-        InProgress,
-        Signed,
-        Canceled
+       Pending,
+       Concluded,
+       Declined
     }
     
     public class Contract : BaseEntity
     {
+        public string Label { get; set; }
+        
         public string CreatorId { get; set; }
 
         public string ClientId { get; set; }
 
+        public string DocumentId { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
-        public DateTime ExpiresAt { get; set; }
+        public DateTime ExpireAt { get; set; }
 
-        public bool IsSigned { get; set; }
-
+        public string Description { get; set; }
         public ContractStatus Status { get; set; }
 
         public AppUser? Creator { get; set; }

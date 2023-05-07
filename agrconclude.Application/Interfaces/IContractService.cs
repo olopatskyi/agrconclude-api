@@ -1,3 +1,5 @@
+using agrconclude.Application.DTOs.Request;
+
 namespace agrconclude.Application.Interfaces;
 
 public interface IContractService
@@ -6,5 +8,7 @@ public interface IContractService
 
     Task<TOut> GetByIdAsync<TOut>(string id);
 
-    Task<TOut> GetAllAsync<TOut>(string userId);
+    Task<TOut> GetAllAsync<TOut>(string userId, bool isMine);
+
+    Task SignContractAsync(SignContractVM model);
 }

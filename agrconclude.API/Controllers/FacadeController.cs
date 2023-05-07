@@ -10,6 +10,7 @@ public class FacadeController : ControllerBase
     private string GetUserId()
     {
         var id = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return id;
+        
+        return id!;
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using agrconclude.Infrastructure.Data;
@@ -11,9 +12,11 @@ using agrconclude.Infrastructure.Data;
 namespace agrconclude.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230501152833_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,9 +184,6 @@ namespace agrconclude.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
-
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -230,50 +230,6 @@ namespace agrconclude.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "673b7fe0-5a4d-4d9c-9ecb-7c0a6ce7aac9",
-                            AccessFailedCount = 0,
-                            AvatarUrl = "30440b33-3c2f-4ffc-b69f-2ac62ba0cc8c",
-                            ConcurrencyStamp = "89dedbc71ba7497ca80538710808d2e1",
-                            Email = "943ef157-4e31-4baf-b5ec-f5d0689ff94c@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "50af4423-717f-4815-9e74-1668663ae86d",
-                            Gender = 0,
-                            LastName = "efa15b52-0385-458c-8553-bda5541048f3",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "DCF31A11-3DBC-40FA-BE90-45C68F77BC2A@EXAMPLE.COM",
-                            NormalizedUserName = "7E6F5234-F378-4505-8990-CD015AD15C4E",
-                            PasswordHash = "b3e0b9ac903d402483fa10de65eff6af",
-                            PhoneNumber = "555-3d56941",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "fbe12a57-9db0-4e2f-8b10-a7c261b04549",
-                            TwoFactorEnabled = false,
-                            UserName = "e57d4571-96a5-4846-a1b1-01ffc16e98bb"
-                        },
-                        new
-                        {
-                            Id = "a5c8be74-5e83-40a9-8b45-66c9fde89ffa",
-                            AccessFailedCount = 0,
-                            AvatarUrl = "af30b25b-879f-421a-8c8a-dd299c1c1851",
-                            ConcurrencyStamp = "fad656a66b974071b1a74030242bda39",
-                            Email = "30606798-09db-445a-bdf7-672d6cc40def@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "8c39cfdc-43a7-4be9-b6f7-751b89348c2e",
-                            Gender = 0,
-                            LastName = "4e64cdc5-e851-4735-95da-183df0f80e05",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "5A05BCB4-8BCC-463D-ADE0-E8EB048E4D71@EXAMPLE.COM",
-                            NormalizedUserName = "E4813573-3F10-4BE0-8ED3-55788AC1D1B0",
-                            PasswordHash = "68f4ec793e2c4b26a8d58a495fd2f2fe",
-                            PhoneNumber = "555-41423a8",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "d6dc53a7-e0fd-4e65-9f77-80c329732181",
-                            TwoFactorEnabled = false,
-                            UserName = "077b0519-080d-4971-b360-c2ade3c727af"
-                        });
                 });
 
             modelBuilder.Entity("agrconclude.Domain.Entities.Contract", b =>
@@ -292,20 +248,8 @@ namespace agrconclude.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("DocumentId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ExpireAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("IsSigned")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
