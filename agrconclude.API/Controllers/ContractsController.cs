@@ -5,7 +5,7 @@ using agrconclude.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/contracts")]
+[Route("api/v1/contracts")]
 [Authorize]
 public class ContractsController : FacadeController
 {
@@ -33,18 +33,18 @@ public class ContractsController : FacadeController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(CreateContractVM model)
+    public async Task<IActionResult> CreateAsync([FromBody]CreateContractVM model)
     {
         await _contractService.CreateAsync<CreateContractVM>(UserId, model);
         
         return Created("api/contracts",null);
     }
 
-    [HttpPatch]
+    [HttpPatch("{contractId}")]
 
-    public async Task<IActionResult> SignContract(SignContractVM model)
+    public async Task<IActionResult> SignContract(string contractId, [FromBody]SignContractVM model)
     {
-        await _contractService.SignContractAsync(model);
+        await _contractService.SignContractAsync(contractId, model);
         
         return Ok();
     }

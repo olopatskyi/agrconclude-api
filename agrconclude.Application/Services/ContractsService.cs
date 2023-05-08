@@ -42,9 +42,9 @@ public class ContractService : IContractService
         return _mapper.Map<TOut>(result);
     }
 
-    public async Task SignContractAsync(SignContractVM model)
+    public async Task SignContractAsync(string contractId, SignContractVM model)
     {
-        var entity = await _repository.GetByIdAsync(model.ContractId);
+        var entity = await _repository.GetByIdAsync(contractId);
         if (entity is null)
         {
             throw new Exception("Contract not found");

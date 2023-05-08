@@ -1,4 +1,4 @@
-using agrconclude.Application.DTOs;
+using agrconclude.Application.DTOs.Request;
 using agrconclude.Application.Interfaces;
 using agrconclude.Domain.Entities;
 using AutoMapper;
@@ -26,5 +26,26 @@ public class UserService : IUserService
             .ToListAsync();
         
         return _mapper.Map<TOut>(users);
+    }
+
+    public async Task<AppUser> GetProfile(string id)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+        return user;
+    }
+
+    public async Task UpdateAsync(string userId, UpdateUserVM model)
+    {
+        var entity = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+        if (entity == null)
+        {
+            throw new Exception("Not found");
+        }
+
+        _mapper.Map(model, entity);
+
+        await _userManager.UpdateAsync(entity);
     }
 }

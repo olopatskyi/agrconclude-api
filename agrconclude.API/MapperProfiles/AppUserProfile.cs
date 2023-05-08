@@ -19,6 +19,7 @@ namespace agrconclude.API.MapperProfiles
             CreateMap<GoogleJsonWebSignature.Payload, AppUser>(MemberList.None)
                 .AfterMap((src, dest) =>
                 {
+                    dest.Id = Guid.NewGuid().ToString();
                     dest.UserName = src.Email;
                     dest.AvatarUrl = src.Picture;
                     dest.NormalizedUserName = src.Name.ToUpper();
@@ -33,6 +34,7 @@ namespace agrconclude.API.MapperProfiles
                     dest.LockoutEnabled = false;
                 });
 
+            CreateMap<UpdateUserVM, AppUser>(MemberList.None);
             CreateMap<AppUser, AppUserDTO>(MemberList.Destination);
         }
     }

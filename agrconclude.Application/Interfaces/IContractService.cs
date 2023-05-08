@@ -10,5 +10,5 @@ public interface IContractService
 
     Task<TOut> GetAllAsync<TOut>(string userId, bool isMine);
 
-    Task SignContractAsync(SignContractVM model);
+    Task SignContractAsync(string contractId, SignContractVM model);
 }
