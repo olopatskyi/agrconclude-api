@@ -1,4 +1,5 @@
 using agrconclude.Application.DTOs;
+using agrconclude.Application.DTOs.Request;
 using agrconclude.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -30,4 +31,13 @@ public class UsersController : FacadeController
 
         return Ok(result);
     }
+
+    [HttpPatch("/api/v1/profile")]
+    public async Task<IActionResult> UpdateAsync(UpdateUserVM model)
+    {
+        await _userService.UpdateAsync(UserId, model);
+
+        return Ok();
+    }
+    
 }
