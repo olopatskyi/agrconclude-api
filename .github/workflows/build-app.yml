@@ -38,7 +38,7 @@ jobs:
         password: ${{ env.DOCKER_HUB_PASSWORD }}
         
     - name: Build Docker Image
-      run: docker build -t olopatskyi/agrconcludeapi .
+      run: docker build -t lopatskyi/agrconcludeapi .
       
     - name: Push Docker Image
-      run: docker push olopatskyi/agrconcludeapi
+      run: docker push lopatskyi/agrconcludeapi
